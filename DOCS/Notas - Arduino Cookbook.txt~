@@ -1,0 +1,217 @@
+LDR --> é possível obter os valores de luminosidade do ambiente com um LDR. Fiz um sketch que retorna o valor que está sendo lido para a serial
+um em que é possível colocar o limite e estipular o dia e a noite.
+
+
+
+Este é o esqueleto principal de um sketch arduíno.
+
+
+int main(void)
+{
+  init();
+  setup();
+  for (;;)
+    loop();
+  return 0;
+}
+
+
+
+
+TYPES
+
+Interessante sobre strings:
+
+Além de utilizar o objeto String que tem mais funcionalidades a um custo maior de memória, é possível declarar strings de várias outras formas.
+
+  char Str1[15];
+  char Str2[8] = {'a', 'r', 'd', 'u', 'i', 'n', 'o'};
+  char Str3[8] = {'a', 'r', 'd', 'u', 'i', 'n', 'o', '\0'};
+  char Str4[ ] = "arduino";
+  char Str5[8] = "arduino";
+  char Str6[15] = "arduino";
+
+O compilador insere automaticamente o caractere nulo '\0'.
+Quando uma string for instanciada dentro de "" o compilador ajusta o tamanho da variável na memória e adiciona o caractere nulo no final da cadeia de chars.
+
+
+Se uma string for declarada com tamanho definido e não incluir o espaço para o caractere nulo e nem declarar o caractere nulo, pode ocorrer problemas na execução do programa.
+
+
+Long strings:
+
+char myString[] = "This is the first line"
+" this is the second line"
+" etcetera";
+
+
+Um array de strings necessita ser declarado como um array de ponteiros char:
+
+char* myStrings[]={"This is string 1", "This is string 2", "This is string 3",
+"This is string 4", "This is string 5","This is string 6"};
+
+
+char string [] = "Arduino";
+
+strlen(string); --> devolve o tamanho da string;
+strcpy(destination,source) --> copia uma string na outra;
+
+strncpy(destination,source,n)--> limita o numero de caracteres a copiar;
+strcat(destination,source) --> concatena as strings;
+strcmp(str1,str2) --> compara strings;
+
+
+
+Este código pega os valores dos sensores e transformam em porcentagem.
+
+int sensorPercent(int pin)
+{
+  int percent;
+}
+  int val = analogRead(pin); // read the sensor (ranges from 0 to 1023)
+  percent = map(val,0,1023,0,100); // percent will range from 0 to 100.
+  return percent;
+
+
+
+
+
+Debounce Button
+
+O sketch do livro é bom que é possível utilizar vários botões por ser uma função. Contudo para realizar um toggle, o sketch do site do arduino é bem mais consistente. Só que não consegui colocar em uma função. Existe a classe Bounce2 que também não achei consistente para fazer um toggle. Contudo, o debounce é para retirar aquela variação inicial do botão. Eu é que quero fazer um toggle.
+
+
+
+no livro mostra um detalhe interessante de como utilizar um hold button e ir incrementando o valor exponencialmente. sketch buttonHoldTime.
+
+
+* KEYPAD
+
+Bibliotecas novas até agora:
+ - Bounce2;
+ - Keypad.
+
+Trabalhando com keypads é muito interessante. Tenho aquele keypad flat que possui 16 posições. um teclado hexanumérico.
+Possui 8 pinos de saída. os 4 primeiros são as linhas e os outros 4 são as colunas.
+
+A ideia é que 4 sejam input e os outros output. No arduíno é possível colocar como pull-up, e a tecla acionada estará em down. Ou fazer pull-up e pull-down em hardware.
+
+Provavelmente é o estilo de um cubo de led. Como se fosse uma camada.
+
+No caso para saber se uma tecla foi pressionada, é feito um rastreio das teclas, pelo jeito quanto maior o numero de teclas mais lento será.
+Fiz um teste e o tempo que demorou para varrer o teclado 4x4 foi de 140 a 144 microsegundos. bem rápido.
+
+Utilizar a biblioteca Keypad torna o uso muito simples. E os códigos de exemplo são muuuuito interessantes. Multikey, eventos... muito completo e complexo.
+
+
+POTENCIÔMETROS.
+
+Ao utilizar potenciômetros, percebi que a variação de resistência, ou os valores lidos na porta analógica, vai aumentando de acordo com a posição do potenciômetro. quer dizer, no início a variação é pouca, mas para perto do fim ela é maior, e os valores mudam mais rapidamente.
+
+LEITURA ANALÓGICA.
+
+utilizei o Chip CD4051BE Multiplex Analógico para expandir as portas analógicas e funcionou. Fiz a leitura com nenhum delay entre as leituras e não ocorreu erro. leu perfeitamente.
+
+O algorítimo para criar a tabela verdade foi interessante.
+
+ABC S
+000 0
+001 1
+010 2
+011 3
+100 4
+101 5
+110 6
+111 7
+
+A função que faz a leitura, recebe um número referente ao canal que vai ser lido. Para gerar os bits correspondentes foi feito o seguinte algoritimo
+
+um for varre os bits 0 1 2. Para cada bit ele lê o bit correspondente com a função bitRead.
+e escreve na porta correspondente a entrada da tabela verdade.
+
+
+
+VOLTAGEM DE BATERIA EM UMA ANALOG INPUT
+
+essa é uma abordagem importante, saber quanto de voltagem ainda tem uma bateria. As entradas analógicas medem tensão e dependendo da placa a tensão de referência é 5V ou 3.3V.
+
+Para medir a voltagem da bateria com o arduino, basta ligar a bateria, o negativo no ground e o positivo na entrada analogica. Contudo, somente voltagens até a voltagem de referência da board.
+
+
+Medindo a voltagem utilizando variáveis float, ocupam mais memoria do que com inteiros. Para eficiência, uma jogada seria pegar o valor em milivolts.
+
+Como:
+cada passo é 5V/1023... então para ter uma boa resolução você aumenta o valor da referência. No caso para ficar bem parecido com a leitura com float, usa-se o passo 500000/1023.
+depois desse passo, multiplica pelo valor obtido na porta analogica. e por fim para mostrar em milivolts, basta dividir pelos números de zero a mais, que no caso são dois de 500000.
+
+A resposta será então em milivolts, sem perder a resolução.
+
+Para ler voltagens maiores que 5V será necessário utilizar um divisor de tensão. No caso de 9V, pode-se dividir pela metade, isto é 4,5V.
+
+Fiz os divisores de tensão com 3 valores diferentes de par de resistores e constatei que os mesmos leram a mesma voltagem. O beneficio foi que quanto maior o  valor da resistencia, menor foi a corrente.
+1K, 4K7 e 10k.
+
+
+SENSORES:
+
+Sensores provêem informações das seguintes formas:
+
+ - digitais;
+ - analógicas;
+ - pulsos;
+ - serial;
+ - 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
