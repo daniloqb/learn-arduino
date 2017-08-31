@@ -1,7 +1,7 @@
 
 
 int sensor_pin = A0;
-int numberOfSamples  = 500;
+int numberOfSamples  = 1000;
 long averageReading;
 int sensor_value;
 
