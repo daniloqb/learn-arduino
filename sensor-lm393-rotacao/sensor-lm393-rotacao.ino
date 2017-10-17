@@ -23,7 +23,7 @@ void setup()
   pinMode(pino_D0, INPUT);
   //Interrupcao 0 - pino digital 2
   //Aciona o contador a cada pulso
-  attachInterrupt(0, contador, FALLING);
+  attachInterrupt(0, contador, RISING);
   pulsos = 0;
   rpm = 0;
   timeold = 0;
