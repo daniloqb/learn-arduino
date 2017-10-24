@@ -54,9 +54,9 @@ void setup()
   rtc.begin();
   
   // The following lines can be uncommented to set the date and time
- // rtc.setDOW(MONDAY);     // Set Day-of-Week to SUNDAY
-//  rtc.setTime(22, 31, 0);     // Set the time to 12:00:00 (24hr format)
- // rtc.setDate(16, 10, 2017);   // Set the date to January 1st, 2014
+  rtc.setDOW(MONDAY);     // Set Day-of-Week to SUNDAY
+  rtc.setTime(22, 31, 0);     // Set the time to 12:00:00 (24hr format)
+  rtc.setDate(16, 10, 2017);   // Set the date to January 1st, 2014
 }
 
 void loop()
