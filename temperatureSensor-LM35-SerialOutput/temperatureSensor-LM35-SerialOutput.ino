@@ -1,5 +1,5 @@
 /*
- * 20160603 - Read Analog Value from LDR sensor
+ * 20160603 - Read Analog Value from LM35 sensor
  */
 
 

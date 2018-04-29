@@ -386,6 +386,8 @@ Fazendo alguns ajustes de numeros de samples para leitura e threshold foi possí
 
 
 
+17/11/2017
+
 
 
 
